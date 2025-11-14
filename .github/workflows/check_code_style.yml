@@ -20,17 +20,37 @@ jobs:
 
       - name: Run isort
         run: |
-          find . -name "*.py" -print0 | xargs -0 isort --line-length=180 --profile=black
+          FILES=$(find . -name "*.py")
+          if [ -z "$FILES" ]; then
+            echo "::warning::No Python files found for isort"
+          else
+            find . -name "*.py" -print0 | xargs -0 isort --line-length=180 --profile=black
+          fi
 
       - name: Run black
         run: |
-          find . -name "*.py" -print0 | xargs -0 black --line-length=180
+          FILES=$(find . -name "*.py")
+          if [ -z "$FILES" ]; then
+            echo "::warning::No Python files found for black"
+          else
+            find . -name "*.py" -print0 | xargs -0 black --line-length=180
+          fi
 
       - name: Run flake8
         run: |
-          find . -name "*.py" -print0 | xargs -0 flake8 --ignore=E265,E266,E501,E731,F401,W503,W504
+          FILES=$(find . -name "*.py")
+          if [ -z "$FILES" ]; then
+            echo "::warning::No Python files found for flake8"
+          else
+            find . -name "*.py" -print0 | xargs -0 flake8 --ignore=E265,E266,E501,E731,F401,W503,W504
+          fi
 
       - name: Run yamllint
         run: |
-          find . -type f \( -name "*.yml" -o -name "*.yaml" \) -print0 \
-          | xargs -0 yamllint -d "{extends: relaxed, rules: {line-length: {max: 180}}}"
+          FILES=$(find . -type f \( -name "*.yml" -o -name "*.yaml" \))
+          if [ -z "$FILES" ]; then
+            echo "::warning::No YAML files found for yamllint"
+          else
+            find . -type f \( -name "*.yml" -o -name "*.yaml" \) -print0 \
+            | xargs -0 yamllint -d "{extends: relaxed, rules: {line-length: {max: 180}}}"
+          fi
