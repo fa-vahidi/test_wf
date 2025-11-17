@@ -1,0 +1,70 @@
+name: Run Tests
+
+on:
+  workflow_run:
+    workflows: ["Check Code Style"]  # This references the workflow that should be completed before running this one
+    types:
+      - completed
+
+jobs:
+  test_no_env:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]  # Runs on Linux, Windows, and macOS
+        python-version: ['3.12']  # The latest 5 Python versions
+      fail-fast: false  # Continue testing other platforms even if one fails
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies (without virtual environment)
+        run: |
+          pwd
+          ls -a
+          pip install -r ./requirements.txt
+
+      - name: Run tests
+        run: |
+          pytest tests/
+
+  test_conda:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]  # Runs on Linux, Windows, and macOS
+        python-version: ['3.12']  # The latest 5 Python versions
+      fail-fast: false  # Continue testing other platforms even if one fails
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up conda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          miniconda-version: "latest"
+          auto-update-conda: true
+          python-version: ${{ matrix.python-version }}
+          activate-environment: logger
+
+      - name: Print conda info and activate logger environment
+        run: |
+          pwd
+          ls -a
+          conda init
+          conda info
+          conda activate logger
+
+      - name: Update the conda environment
+        run: |
+          conda env update -f ./environment.yml
+          conda activate logger
+
+      - name: Run tests
+        run: |
+          pytest tests/
