@@ -25,8 +25,6 @@ jobs:
 
       - name: Install dependencies (without virtual environment)
         run: |
-          pwd
-          ls -a
           pip install -r ./requirements.txt
 
       - name: Run tests
@@ -52,11 +50,12 @@ jobs:
           python-version: ${{ matrix.python-version }}
           activate-environment: logger
 
+      - name: Initialise conda
+        run: |
+          conda init
+
       - name: Print conda info and activate logger environment
         run: |
-          pwd
-          ls -a
-          conda init
           conda info
           conda activate logger
 
