@@ -1,0 +1,115 @@
+name: Run Tests
+
+on:
+  workflow_run:
+    workflows: ["Check Code Style"]  # This references the workflow that should be completed before running this one
+    types:
+      - completed
+
+jobs:
+
+  check_tests_dir:
+    runs-on: ${{ matrix.os }}
+    outputs:
+      dir_exists: ${{ steps.check_directory.outputs.dir_exists }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - id: check_directory
+        name: Check tests directory
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+
+            // Use path.join to be safe with separators on all platforms.
+            const workspace = process.env.GITHUB_WORKSPACE || '.';
+            const dir_name = 'tests'
+            const dir = path.join(workspace, dir_name);
+
+            let exists = false;
+            try {
+              exists = fs.existsSync(dir) && fs.statSync(dir).isDirectory();
+            } catch (e) {
+              exists = false;
+              console.log(`Failed to check the '${dir_name}' directory:`, e.message);
+            }
+
+            const value = exists ? 'true' : 'false';
+
+            // Write the step output in the runner-supported way
+            // (the runner provides the GITHUB_OUTPUT file path in the env).
+            fs.appendFileSync(process.env.GITHUB_OUTPUT, `dir_exists=${value}\n`);
+
+            // Return value is optional; it's useful in the action logs.
+            return value;
+
+  test_no_env:
+    needs: check_tests_dir
+    # Run this job only if the directory exists
+    if: ${{ needs.check_tests_dir.outputs.dir_exists == 'true' }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]  # Runs on Linux, Windows, and macOS
+        python-version: ['3.12']  # The latest 5 Python versions
+      fail-fast: false  # Continue testing other platforms even if one fails
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+
+      - name: Install dependencies (without virtual environment)
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r "${{ github.workspace }}/requirements.txt"
+
+      - name: Run tests
+        run: |
+          python -m pytest "${{ github.workspace }}/tests/"
+
+  test_conda:
+    needs: check_tests_dir
+    # Run this job only if the directory exists
+    if: ${{ needs.check_tests_dir.outputs.dir_exists == 'true' }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]  # Runs on Linux, Windows, and macOS
+        python-version: ['3.12']  # The latest 5 Python versions
+      fail-fast: false  # Continue testing other platforms even if one fails
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up conda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          miniconda-version: "latest"
+          auto-update-conda: true
+          python-version: ${{ matrix.python-version }}
+          activate-environment: logger
+
+      - name: Print conda info and activate logger environment
+        run: |
+          pwd
+          ls -a
+          conda init
+          conda info
+          conda activate logger
+
+      - name: Update the conda environment
+        run: |
+          conda env update -f ${{ github.workspace }}/environment.yml
+          conda activate logger
+
+      - name: Run tests
+        run: |
+          pytest ${{ github.workspace }}/tests/
