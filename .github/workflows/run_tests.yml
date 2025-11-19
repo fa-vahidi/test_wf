@@ -63,6 +63,19 @@ jobs:
           python-version: ${{ matrix.python-version }}
           activate-environment: logger
 
+      - name: List all files and dirs in root
+        run: |
+          echo "In Root:"
+          ls -a /
+          echo "In /home:"
+          ls -a /home
+          echo "In /home/runner:"
+          ls -a /home/runner/
+          echo "In ~:"
+          ls -a ~
+          echo "In Current:"
+          ls -a .
+
       - name: Initialise conda
         run: |
           conda init
