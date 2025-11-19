@@ -27,7 +27,11 @@ jobs:
         run: |
           echo "In Root:"
           ls -a /
-          echo "In Home:"
+          echo "In /home:"
+          ls -a /home
+          echo "In /home/runner:"
+          ls -a /home/runner/
+          echo "In ~:"
           ls -a ~
           echo "In Current:"
           ls -a .
