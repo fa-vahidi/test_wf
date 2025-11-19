@@ -88,8 +88,15 @@ jobs:
         run: |
           conda info
 
+      - name: List conda environments
+        run: |
+          conda env list
+
       - name: Activate logger environment
         run: |
+          conda init
+          source ~/.bashrc
+          conda env list
           conda activate logger
 
       - name: Update the conda environment and reactivate logger environment
