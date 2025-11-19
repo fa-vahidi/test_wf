@@ -80,12 +80,19 @@ jobs:
         run: |
           conda init
 
-      - name: Print conda info and activate logger environment
+      - name: Update shell
+        run: |
+          source ~/.bashrc
+
+      - name: Print conda info
         run: |
           conda info
+
+      - name: Activate logger environment
+        run: |
           conda activate logger
 
-      - name: Update the conda environment
+      - name: Update the conda environment and reactivate logger environment
         run: |
           conda env update -f ./environment.yml
           conda activate logger
