@@ -99,9 +99,12 @@ jobs:
           conda env list
           conda activate logger
 
-      - name: Update the conda environment and reactivate logger environment
+      - name: Update the conda environment
         run: |
           conda env update -f ./environment.yml
+
+      - name: Activate logger environment
+        run: |
           conda activate logger
 
       - name: Run tests
