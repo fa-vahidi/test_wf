@@ -80,9 +80,12 @@ jobs:
           echo "-----------"
           echo "In ~/.cache"
           ls -a ~/.cache
+          #echo "-----------"
+          #echo "In ~/.cache/pip"
+          #ls -a ~/.cache/pip
           echo "-----------"
-          echo "In ~/.cache/pip"
-          ls -a ~/.cache/pip
+          echo "In ~/.cache/conda"
+          ls -a ~/.cache/conda
           echo "-----------"
           echo "In ~/.conda"
           ls -a ~/.conda
