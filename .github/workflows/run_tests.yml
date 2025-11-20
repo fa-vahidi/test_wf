@@ -44,7 +44,7 @@ jobs:
           ls -a ~/.cache
           echo "-----------"
           echo "In ~/.cache/pip"
-          ls -a
+          ls -a ~/.cache/pip
 
       - name: Run tests
         run: |
