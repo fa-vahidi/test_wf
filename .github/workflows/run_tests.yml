@@ -39,6 +39,12 @@ jobs:
           ls -a ~
           echo "In Current:"
           ls -a .
+          echo "-----------"
+          echo "In ~/.cache"
+          ls -a ~/.cache
+          echo "-----------"
+          echo "In ~/.cache/pip"
+          ls -a
 
       - name: Run tests
         run: |
