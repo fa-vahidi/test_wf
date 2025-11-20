@@ -16,7 +16,7 @@ jobs:
       fail-fast: false  # Continue testing other platforms even if one fails
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v3
@@ -53,7 +53,17 @@ jobs:
       fail-fast: false  # Continue testing other platforms even if one fails
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
+
+      - name: Cache conda packages
+        id: cache-conda-packages
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            ~/conda_pkgs_dir
+            ${{ env.CONDA }}/pkgs
+          key: conda-packages-${{ runner.os }}-${{ hashFiles('environment.yml') }}
+          restore-keys: conda-packages-${{ runner.os }}-
 
       - name: Set up conda
         uses: conda-incubator/setup-miniconda@v3
@@ -64,53 +74,30 @@ jobs:
           miniconda-version: "latest"
           python-version: ${{ matrix.python-version }}
 
+      - name: Check conda env parameter
+        run: |
+          echo "conda path: $CONDA"
+
       - name: List all files and dirs in root
         run: |
           echo "In Root:"
           ls -a /
-          echo "-----------"
           echo "In /home:"
           ls -a /home
-          echo "-----------"
           echo "In /home/runner:"
           ls -a /home/runner/
-          echo "-----------"
           echo "In ~:"
           ls -a ~
-          echo "-----------"
-          echo "In ~/.cache"
-          ls -a ~/.cache
-          #echo "-----------"
-          #echo "In ~/.cache/pip"
-          #ls -a ~/.cache/pip
-          echo "-----------"
-          echo "In ~/.cache/conda"
-          ls -a ~/.cache/conda
-          echo "-----------"
-          echo "In ~/.conda"
-          ls -a ~/.conda
-          echo "-----------"
-          echo "In ~/.conda/pkgs"
-          ls -a ~/.conda/pkgs
-          echo "----------"
           echo "In Current:"
           ls -a .
-          echo "-----------"
-          echo "In $CONDA:"
-          ls -a $CONDA
-          echo "-----------"
-          echo "In $CONDA/pkgs:"
-          ls -a $CONDA/pkgs
 
       - name: Setup conda environment and run tests
         run: |
           conda init
           source ~/.bashrc
-          echo "conda path: $CONDA"
           source "$CONDA/etc/profile.d/conda.sh"
           conda info
           conda env list
           conda activate logger
           conda env update -f ./environment.yml
-          #conda activate logger
           pytest tests/
