@@ -76,6 +76,10 @@ jobs:
           ls -a ~
           echo "In Current:"
           ls -a .
+          echo "In $CONDA:"
+          ls -a $CONDA
+          echo "In $CONDA/pkgs:"
+          ls -a $CONDA/pkgs
 
       - name: Setup conda environment and run tests
         run: |
