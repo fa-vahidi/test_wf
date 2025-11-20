@@ -61,7 +61,7 @@ jobs:
         with:
           path: |
             ~/conda_pkgs_dir
-            ${{ env.CONDA }}/pkgs
+            ~/miniconda3/pkgs
           key: conda-packages-${{ runner.os }}-${{ hashFiles('environment.yml') }}
           restore-keys: conda-packages-${{ runner.os }}-
 
