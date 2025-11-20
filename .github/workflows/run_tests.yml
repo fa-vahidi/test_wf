@@ -23,6 +23,10 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Install dependencies (without virtual environment)
+        run: |
+          pip install -r ./requirements.txt
+
       - name: List all files and dirs in root
         run: |
           echo "In Root:"
@@ -35,11 +39,7 @@ jobs:
           ls -a ~
           echo "In Current:"
           ls -a .
-
-      - name: Install dependencies (without virtual environment)
-        run: |
-          pip install -r ./requirements.txt
-
+  
       - name: Run tests
         run: |
           pytest tests/
