@@ -39,7 +39,7 @@ jobs:
           ls -a ~
           echo "In Current:"
           ls -a .
-  
+
       - name: Run tests
         run: |
           pytest tests/
