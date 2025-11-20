@@ -55,16 +55,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v5
 
-      - name: Cache conda packages
-        id: cache-conda-packages
-        uses: actions/cache/restore@v4
-        with:
-          path: |
-            ~/conda_pkgs_dir
-            ~/miniconda3/pkgs
-          key: conda-packages-${{ runner.os }}-${{ hashFiles('environment.yml') }}
-          restore-keys: conda-packages-${{ runner.os }}-
-
       - name: Set up conda
         uses: conda-incubator/setup-miniconda@v3
         with:
@@ -77,6 +67,16 @@ jobs:
       - name: Check conda env parameter
         run: |
           echo "conda path: $CONDA"
+
+      - name: Cache conda packages
+        id: cache-conda-packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/conda_pkgs_dir
+            ${{ env.CONDA }}/pkgs
+          key: conda-packages-${{ runner.os }}-${{ hashFiles('environment.yml') }}
+          restore-keys: conda-packages-${{ runner.os }}-
 
       - name: List all files and dirs in root
         run: |
